@@ -1,7 +1,10 @@
 package com.example.graphiclayermodifier
 
+import android.util.Log
 import android.view.animation.BounceInterpolator
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,14 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.sin
 
 @Composable
 fun Wordle() {
 
-    val flipAnimatable = remember { Animatable(0f) }
-
-
     val text = "GREAT"
+    val letterCount = text.count()
     val padding = 24.dp
     var enabled by remember { mutableStateOf(true) }
 
@@ -43,12 +45,30 @@ fun Wordle() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            repeat(5) {
+            repeat(letterCount) {
+                count ->
+                val firstDelay = 250
+                val firstDuration = 500
+                val secondDelay = 100
+                val secondDuration = 500
+                val previousDelay = (letterCount - 1) * firstDelay + firstDuration
+
                 val rotationX by transition.animateFloat(
                     transitionSpec = {
                         tween(
-                            delayMillis = it * 250,
-                            durationMillis = it * 250 + 500
+                            delayMillis = count * firstDelay,
+                            durationMillis = firstDuration
+                        )
+                    },
+                    label = ""
+                ) { if (it) 0f else 180f }
+
+                val translationY by transition.animateFloat(
+                    transitionSpec = {
+                        tween(
+                            delayMillis = previousDelay + count * secondDelay,
+                            durationMillis = secondDuration,
+                            easing = { BounceInterpolator().getInterpolation(it) }
                         )
                     },
                     label = ""
@@ -56,18 +76,19 @@ fun Wordle() {
 
                 DoubleSide(
                     rotationX = rotationX,
+                    translationY = -100 * sin(translationY * Math.PI.toFloat()/180f),
                     flipType = FLIPTYPE.HORIZONTAL,
                     cameraDistance = 100f,
                     front = {
                         MyLetterCard(
-                            text[it].toString(),
+                            text[count].toString(),
                             Color.Black,
                             Color(58, 58, 60)
                         )
                     },
                     back = {
                         MyLetterCard(
-                            text[it].toString(),
+                            text[count].toString(),
                             Color(95, 139, 85),
                             Color(95, 139, 85)
                         )
