@@ -1,6 +1,5 @@
 package com.example.graphiclayermodifier
 
-import android.util.Log
 import android.view.animation.BounceInterpolator
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
