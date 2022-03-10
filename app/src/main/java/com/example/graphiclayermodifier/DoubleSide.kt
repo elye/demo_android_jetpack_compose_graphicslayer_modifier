@@ -50,7 +50,7 @@ fun DoubleSide(
                     translationY = translationY,
                     rotationX = rotationXBack,
                     rotationY = rotationYBack,
-                    rotationZ = rotationZ,
+                    rotationZ = -rotationZ,
                     cameraDistance = cameraDistance
                 )
         ) {
